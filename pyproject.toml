@@ -1,7 +1,7 @@
 [project]
-name = "jessyink-converter"
-version = "0.1.0"
-description = "Herramienta para convertir presentaciones SVG JessyInk a PDF manteniendo efectos visuales."
+name = "web-slides-to-pdf"
+version = "0.2.0"
+description = "Herramienta para convertir presentaciones web (JessyInk, Sozi, HTML/SVG) a PDF manteniendo efectos visuales."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

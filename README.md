@@ -1,84 +1,78 @@
-# 📄 JessyInk to PDF Converter
+# 📄 Web Slides to PDF Converter
 
-Convierte tus presentaciones [Inkscape](https://inkscape.org/) + [JessyInk](https://code.google.com/archive/p/jessyink/) a formato PDF, manteniendo cada efecto y transición como una página individual.
+Convierte tus presentaciones web interactivas (SVG/HTML) a formato PDF estático, manteniendo cada efecto, frame y transición como una página individual.
+
+**Formatos soportados:**
+
+- [JessyInk](https://code.google.com/archive/p/jessyink/) (Extensión de Inkscape)
+- [Sozi](https://sozi.baierouge.fr/) (Editor de presentaciones Zooming)
 
 ## 🚀 Características
 
-- 🎯 **Captura paso a paso:** Convierte cada "clic" o efecto de la presentación en una página del PDF.
+- 🎯 **Captura paso a paso:** Convierte cada "clic" (JessyInk) o frame (Sozi) en una página del PDF.
 - 🖼️ **Alta Calidad:** Utiliza un motor de navegador real (Chromium) para renderizar los SVG exactamente como se ven en pantalla.
-- 📦 **Eficiencia:** El modo CLI permite automatización sin sobrecarga de interfaz gráfica.
+- 📦 **Multi-plataforma:** Detecta automáticamente el tipo de presentación.
+- ⚡ **Eficiencia:** Modo CLI para automatización y modo Web para uso fácil.
 
-## ☁️ Uso Online (sin descargas)
+## ☁️ Uso online
 
-La forma más rápida de usar la herramienta es a través de nuestra aplicación en la nube. No necesitas instalar nada.
+La forma más rápida de usar la herramienta es a través de nuestra aplicación en la nube.
 
-👉 **[Abrir JessyInk Converter en Streamlit Cloud](https://jessyink-converter.streamlit.app/)**
+👉 **[Abrir Web Slides Converter en Streamlit Cloud](https://jessyink-converter.streamlit.app/)**
 
 ---
 
-## 💻 Uso Local (recomendado: `uv`)
+## 💻 Uso local
 
-Si prefieres ejecutar la herramienta en tu propio equipo (para mayor privacidad o para procesar múltiples archivos por lotes), recomendamos usar **[uv](https://docs.astral.sh/uv/)**.
-
-Esta herramienta gestiona el entorno virtual automáticamente y es extremadamente rápida.
+Recomendamos usar **[uv](https://docs.astral.sh/uv/)** para gestionar las dependencias de forma rápida y aislada.
 
 ### 1. Preparación
 
-Asegúrate de tener instalado `uv` y clona el repositorio:
-
 ```bash
-# Instalar uv (macOS/Linux)
+# Instalar uv (si no lo tienes)
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Instalar uv (Windows)
-powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
-
 # Clonar repo
-git clone https://github.com/tu-usuario/jessyink-converter.git
-cd jessyink-converter
+git clone https://github.com/tu-usuario/web-slides-to-pdf.git
+cd web-slides-to-pdf
 ```
 
-### 2. Opción A: Usar solo la Línea de Comandos (CLI)
+### 2. Opción A: Línea de Comandos (CLI)
 
-Esta es la opción más ligera. **No instala Streamlit** ni otras dependencias web, solo lo necesario para convertir el PDF.
+Ideal para scripts, procesamiento por lotes o servidores.
 
 ```bash
-# 1. Instalar dependencias base (sin Streamlit)
+# 1. Instalar dependencias
 uv sync
 
-# 2. Instalar el navegador necesario (solo la primera vez)
+# 2. Instalar el navegador (solo la primera vez)
 uv run playwright install chromium
 
-# 3. Ejecutar el conversor
-uv run cli.py tu-presentacion.svg
+# 3. Convertir archivo
+uv run cli.py mi-presentacion.svg
 ```
 
-**Ejemplos de uso CLI:**
+**Ejemplos avanzados:**
 
 ```bash
-# Convertir con máxima calidad (escala 8x)
-uv run cli.py presentacion.svg -q 8
+# Convertir Sozi (html) con calidad máxima (8x)
+uv run cli.py presentacion-sozi.html -q 8
 
-# Procesar una carpeta completa
-uv run cli.py ./mis-archivos/
+# Procesar una carpeta mixta (SVG y HTML)
+uv run cli.py ./mis-proyectos/
 ```
 
-### 3. Opción B: Ejecutar la Interfaz Web localmente
-
-Si deseas la interfaz gráfica en tu propia máquina, necesitas instalar el grupo de dependencias `web`.
+### 3. Opción B: Interfaz Gráfica (Web UI local)
 
 ```bash
-# 1. Instalar dependencias incluyendo Streamlit
+# 1. Instalar dependencias web
 uv sync --extra web
 
-# 2. Instalar navegador (si no lo hiciste antes)
-uv run playwright install chromium
-
-# 3. Iniciar la app
+# 2. Iniciar la app
 uv run streamlit run app.py
 ```
 
-## 🛠 Desarrollo y Despliegue
+## 🛠 Desarrollo
 
-Este proyecto utiliza `pyproject.toml` para la gestión de dependencias moderna.
-El archivo `requirements.txt` se incluye principalmente para compatibilidad con el entorno de despliegue de Streamlit Cloud.
+Este proyecto utiliza `pyproject.toml` para la configuración.
+El archivo `requirements.txt` se mantiene únicamente para compatibilidad con el despliegue en Streamlit Cloud.

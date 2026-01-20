@@ -8,9 +8,7 @@ from core import convert_presentation
 
 def cli_progress(current, total, message):
     """Callback para mostrar barra de progreso en la terminal."""
-    # Espacios para limpiar residuos de líneas anteriores más largas
     padding = " " * 20
-
     if total > 0:
         percent = int(current / total * 100)
         sys.stdout.write(f"\r   📸 {message} [{percent}%]{padding}")
@@ -20,44 +18,43 @@ def cli_progress(current, total, message):
 
 
 async def process_files(paths, quality):
-    """Busca archivos SVG en las rutas dadas y ejecuta la conversión."""
+    """Busca archivos SVG/HTML en las rutas dadas y ejecuta la conversión."""
     files_to_process = []
+    valid_exts = {".svg", ".html"}
 
     for path_str in paths:
         path = Path(path_str)
-        if path.is_file() and path.suffix.lower() == ".svg":
+        if path.is_file() and path.suffix.lower() in valid_exts:
             files_to_process.append(path)
         elif path.is_dir():
-            files_to_process.extend(list(path.glob("*.svg")))
+            for ext in valid_exts:
+                files_to_process.extend(list(path.glob(f"*{ext}")))
 
     files_to_process = sorted(list(set(files_to_process)))
 
     if not files_to_process:
-        print("❌ No se encontraron archivos SVG válidos en las rutas especificadas.")
+        print("❌ No se encontraron archivos válidos (.svg, .html) en las rutas.")
         return
 
     print(f"🚀 Procesando {len(files_to_process)} archivos (Calidad: {quality}x)\n")
 
-    for svg_file in files_to_process:
-        output_pdf = svg_file.with_suffix(".pdf")
-        print(f"📄 Procesando: {svg_file.name}")
+    for input_file in files_to_process:
+        output_pdf = input_file.with_suffix(".pdf")
+        print(f"📄 Procesando: {input_file.name}")
 
         try:
-            await convert_presentation(svg_file, output_pdf, quality, cli_progress)
+            await convert_presentation(input_file, output_pdf, quality, cli_progress)
             print(f"\n   ✅ Guardado exitosamente: {output_pdf.name}")
         except Exception as e:
-            print(f"\n   ❌ Error al convertir {svg_file.name}: {e}")
-
+            print(f"\n   ❌ Error al convertir {input_file.name}: {e}")
         print("-" * 40)
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Convertidor de presentaciones JessyInk (SVG) a PDF."
+        description="Convertidor de presentaciones Web (JessyInk, Sozi, etc.) a PDF."
     )
-    parser.add_argument(
-        "paths", nargs="*", help="Archivos .svg o carpetas que los contengan"
-    )
+    parser.add_argument("paths", nargs="*", help="Archivos o carpetas")
     parser.add_argument(
         "-q",
         "--quality",

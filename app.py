@@ -7,7 +7,7 @@ import os
 from pathlib import Path
 from core import convert_presentation
 
-st.set_page_config(page_title="JessyInk a PDF", page_icon="📄", layout="centered")
+st.set_page_config(page_title="Web Slides a PDF", page_icon="📄", layout="centered")
 
 if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
@@ -15,12 +15,8 @@ if sys.platform == "win32":
 
 @st.cache_resource
 def ensure_playwright_installed():
-    """
-    Instala los binarios de Playwright (Chromium).
-    Usamos @st.cache_resource para que esto solo corra una vez al iniciar la app.
-    """
+    """Instala los binarios de Playwright (Chromium)."""
     try:
-        # Usamos sys.executable para asegurar que usamos el entorno python correcto
         subprocess.run(
             [sys.executable, "-m", "playwright", "install", "chromium"],
             check=True,
@@ -28,7 +24,6 @@ def ensure_playwright_installed():
         )
         print("✅ Navegador Chromium verificado/instalado.")
     except subprocess.CalledProcessError as e:
-        # Si falla, mostramos el error en la interfaz
         st.error(f"Error crítico instalando el navegador: {e}")
         if e.stderr:
             st.code(e.stderr.decode())
@@ -39,15 +34,15 @@ def ensure_playwright_installed():
 ensure_playwright_installed()
 
 # --- Interfaz de Usuario ---
-st.title("📄 JessyInk a PDF Converter")
+st.title("📄 Web Slides to PDF Converter")
 st.markdown(
     """
-Convierte tus presentaciones **SVG** (creadas con Inkscape + JessyInk) a formato **PDF**.
-La herramienta captura cada "paso" de la animación como una página individual.
+Convierte presentaciones basadas en tecnologías web (**JessyInk**, **Sozi**, **SVG**, **HTML**) a formato **PDF**.
+La herramienta captura cada paso, frame o transición de la animación como una página individual.
 """
 )
 
-uploaded_file = st.file_uploader("Sube tu archivo .svg", type="svg")
+uploaded_file = st.file_uploader("Sube tu archivo", type=["svg", "html"])
 
 col1, col2 = st.columns(2)
 with col1:
@@ -56,7 +51,7 @@ with col1:
         min_value=1,
         max_value=8,
         value=4,
-        help="Aumenta la resolución de las capturas. Mayor calidad = archivo más pesado y proceso más lento.",
+        help="Aumenta la resolución. Mayor calidad = archivo más pesado y proceso más lento.",
     )
 
 if uploaded_file is not None:
@@ -71,14 +66,15 @@ if uploaded_file is not None:
 
         with tempfile.TemporaryDirectory() as tmp_dir:
             tmp_path = Path(tmp_dir)
-            input_path = tmp_path / "input.svg"
+            # Preservar la extensión original para que el navegador entienda el archivo
+            input_ext = Path(uploaded_file.name).suffix
+            input_path = tmp_path / f"input{input_ext}"
             output_path = tmp_path / "output.pdf"
 
             with open(input_path, "wb") as f:
                 f.write(uploaded_file.getvalue())
 
             try:
-                # Ejecutar la conversión
                 asyncio.run(
                     convert_presentation(input_path, output_path, quality, web_progress)
                 )
@@ -97,4 +93,4 @@ if uploaded_file is not None:
 
             except Exception as e:
                 status_text.empty()
-                st.error(f"Ocurrió un error durante la conversión: {e}")
+                st.error(f"Ocurrió un error: {e}")
